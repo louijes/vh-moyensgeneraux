@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vases d'Honneur — Moyens Généraux</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --teal:#1a7a6e;--teal-dark:#0f4f46;--teal-light:#e6f4f1;
+  --gold:#c9a227;--gold-dark:#8a6c10;
+  --red:#9b2335;
+  --bg:#f2f0eb;--white:#fff;
+  --text:#1a1a1a;--muted:#7a7a7a;
+  --border:#ddd8cc;
+}
+html,body{height:100%;font-family:'DM Sans',sans-serif}
+body{
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(26,122,110,.07) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(201,162,39,.06) 0%, transparent 50%);
+}
+.login-wrap{
+  width:100%;max-width:420px;padding:20px;
+}
+.logo-block{text-align:center;margin-bottom:40px}
+.logo-block img{width:120px;height:120px;border-radius:16px;object-fit:cover;box-shadow:0 4px 24px rgba(0,0,0,.12)}
+.logo-block h1{
+  font-family:'Cormorant Garamond',serif;
+  font-size:26px;font-weight:600;
+  color:var(--teal-dark);margin-top:16px;line-height:1.2
+}
+.logo-block p{font-size:13px;color:var(--muted);margin-top:4px;font-weight:300}
+.card{
+  background:var(--white);
+  border-radius:16px;
+  border:1px solid var(--border);
+  padding:32px;
+  box-shadow:0 2px 16px rgba(0,0,0,.06)
+}
+.field{margin-bottom:18px}
+label{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:6px;letter-spacing:.4px;text-transform:uppercase}
+input{
+  width:100%;padding:11px 14px;
+  border:1px solid var(--border);border-radius:8px;
+  font-size:14px;font-family:'DM Sans',sans-serif;
+  color:var(--text);background:var(--bg);
+  outline:none;transition:border-color .2s,background .2s
+}
+input:focus{border-color:var(--teal);background:#fff}
+.btn-login{
+  width:100%;padding:12px;
+  background:var(--teal);color:#fff;
+  border:none;border-radius:8px;
+  font-size:14px;font-weight:500;font-family:'DM Sans',sans-serif;
+  cursor:pointer;transition:background .2s,transform .1s;
+  margin-top:8px;letter-spacing:.3px
+}
+.btn-login:hover{background:var(--teal-dark)}
+.btn-login:active{transform:scale(.99)}
+.btn-login:disabled{background:#aaa;cursor:not-allowed}
+.err{
+  background:#fdecea;color:var(--red);
+  border:1px solid #f5c6cb;border-radius:8px;
+  padding:10px 14px;font-size:13px;margin-bottom:16px;
+  display:none
+}
+.err.show{display:block}
+.accent-bar{
+  height:3px;border-radius:2px;
+  background:linear-gradient(90deg,var(--teal),var(--gold));
+  margin-bottom:28px
+}
+.footer-note{text-align:center;font-size:11px;color:var(--muted);margin-top:16px}
+</style>
+</head>
+<body>
+<div class="login-wrap">
+  <div class="logo-block">
+    <img src="assets/logo.jpg" alt="Vases d'Honneur" onerror="this.style.display='none'">
+    <h1>Vases d'Honneur</h1>
+    <p>Département des Moyens Généraux</p>
+  </div>
+  <div class="card">
+    <div class="accent-bar"></div>
+    <div class="err" id="err-msg"></div>
+    <div class="field">
+      <label>Adresse email</label>
+      <input type="email" id="email" placeholder="vous@exemple.com" autocomplete="email">
+    </div>
+    <div class="field">
+      <label>Mot de passe</label>
+      <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="btn-login" id="btn-login" onclick="login()">Se connecter</button>
+    <p class="footer-note">Accès réservé au département</p>
+  </div>
+</div>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script>
+document.getElementById('password').addEventListener('keydown', e => {
+  if(e.key === 'Enter') login();
+});
+</script>
+</body>
+</html>

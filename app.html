@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vases d'Honneur — Moyens Généraux</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.3.0/dist/tabler-icons.min.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-logo">VH</div>
+    <div class="topbar-title">Moyens Généraux</div>
+    <div class="topbar-user" onclick="Auth.logout()" id="topbar-user" title="Se déconnecter">
+      <i class="ti ti-logout" style="font-size:18px"></i>
+    </div>
+  </div>
+  <div class="accent-line"></div>
+
+  <!-- NAVIGATION -->
+  <nav class="nav">
+    <button class="nav-btn active" id="nav-stock" onclick="showSection('stock')">
+      <i class="ti ti-package"></i>Stock
+    </button>
+    <button class="nav-btn" id="nav-taches" onclick="showSection('taches')">
+      <i class="ti ti-checklist"></i>Tâches
+    </button>
+    <button class="nav-btn" id="nav-general" onclick="showSection('general')">
+      <i class="ti ti-speakerphone"></i>Annonces
+    </button>
+    <button class="nav-btn" id="nav-messages" onclick="showSection('messages')">
+      <i class="ti ti-message-2"></i>Messages
+    </button>
+  </nav>
+
+  <!-- CONTENU -->
+  <div class="content">
+
+    <!-- ══ STOCK ══════════════════════════════════════════════ -->
+    <div class="section active" id="section-stock">
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-num teal" id="stat-stock-total">—</div>
+          <div class="stat-label">Articles</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num red" id="stat-stock-low">—</div>
+          <div class="stat-label">Stock faible</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num gold">5</div>
+          <div class="stat-label">Catégories</div>
+        </div>
+      </div>
+      <div class="filter-row" id="stock-filters"></div>
+      <div class="card">
+        <div class="card-header">
+          <h3>Inventaire</h3>
+          <button class="btn-primary btn-small" id="btn-add-stock" onclick="UI.openModal('modal-stock')">
+            <i class="ti ti-plus"></i> Ajouter
+          </button>
+        </div>
+        <div class="card-body" id="stock-list">
+          <div class="loading-spinner"><i class="ti ti-loader-2"></i> Chargement…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ TÂCHES ══════════════════════════════════════════════ -->
+    <div class="section" id="section-taches">
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-num teal" id="stat-tasks-encours">—</div>
+          <div class="stat-label">En cours</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num gold" id="stat-tasks-terminees">—</div>
+          <div class="stat-label">Terminées</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num red" id="stat-tasks-urgent">—</div>
+          <div class="stat-label">Urgentes</div>
+        </div>
+      </div>
+      <div class="filter-row" id="task-filters"></div>
+      <div class="card">
+        <div class="card-header">
+          <h3>Tâches assignées</h3>
+          <button class="btn-primary btn-small" id="btn-add-tache" onclick="openModalTache()">
+            <i class="ti ti-plus"></i> Nouvelle
+          </button>
+        </div>
+        <div class="card-body" id="task-list">
+          <div class="loading-spinner"><i class="ti ti-loader-2"></i> Chargement…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ ANNONCES GÉNÉRALES ════════════════════════════════ -->
+    <div class="section" id="section-general">
+      <div id="announce-compose-wrap">
+        <div class="section-label">Nouvelle annonce</div>
+        <div class="compose-card">
+          <textarea id="announce-text" rows="3" placeholder="Écrire un message à tout le département…"></textarea>
+          <div class="compose-footer">
+            <select id="announce-dest">
+              <option value="Tout le département">Tout le département</option>
+              <option value="Équipe bâtiment">Équipe bâtiment</option>
+              <option value="Équipe équipement">Équipe équipement</option>
+              <option value="Équipe entretien">Équipe entretien</option>
+            </select>
+            <button class="btn-primary" onclick="submitAnnonce()">
+              <i class="ti ti-send"></i> Envoyer
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="section-label">Annonces récentes</div>
+      <div class="card">
+        <div class="card-body" id="annonce-list">
+          <div class="loading-spinner"><i class="ti ti-loader-2"></i> Chargement…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ MESSAGES INDIVIDUELS ══════════════════════════════ -->
+    <div class="section" id="section-messages">
+      <div id="msg-list-view">
+        <div class="section-label">Membres du département</div>
+        <div class="card">
+          <div class="member-list" id="member-list">
+            <div class="loading-spinner"><i class="ti ti-loader-2"></i> Chargement…</div>
+          </div>
+        </div>
+      </div>
+      <div id="msg-thread-view" style="display:none">
+        <button class="back-btn" onclick="Messagerie.closeThread()">
+          <i class="ti ti-arrow-left"></i> Retour
+        </button>
+        <div class="card">
+          <div class="card-header" id="thread-header"></div>
+          <div class="card-body">
+            <div class="bubble-area" id="bubble-area"></div>
+            <div class="chat-input">
+              <input type="text" id="chat-in" placeholder="Écrire un message…"
+                onkeydown="if(event.key==='Enter') submitMessage()">
+              <button class="chat-send" onclick="submitMessage()">
+                <i class="ti ti-send"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /app -->
+
+<!-- ══ MODAL: AJOUTER STOCK ══════════════════════════════ -->
+<div class="modal-overlay" id="modal-stock">
+  <div class="modal-box">
+    <div class="modal-title">Ajouter un article</div>
+    <div class="modal-field">
+      <label>Nom de l'article *</label>
+      <input type="text" id="s-nom" placeholder="Ex: Ampoules LED 60W">
+    </div>
+    <div class="modal-row">
+      <div class="modal-field">
+        <label>Catégorie *</label>
+        <select id="s-cat">
+          <option value="">-- Choisir --</option>
+          <option>Entretien</option><option>Électricité</option>
+          <option>Mobilier</option><option>Sécurité</option>
+          <option>Bureautique</option><option>Autre</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label>Unité</label>
+        <input type="text" id="s-unite" placeholder="unité, boîte, litre…">
+      </div>
+    </div>
+    <div class="modal-row">
+      <div class="modal-field">
+        <label>Quantité actuelle *</label>
+        <input type="number" id="s-qty" min="0" placeholder="0">
+      </div>
+      <div class="modal-field">
+        <label>Quantité minimale</label>
+        <input type="number" id="s-min" min="0" placeholder="0">
+      </div>
+    </div>
+    <div class="modal-field">
+      <label>Notes (optionnel)</label>
+      <input type="text" id="s-notes" placeholder="Localisation, fournisseur…">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="UI.closeModal('modal-stock')">Annuler</button>
+      <button class="btn-primary" onclick="submitStock()"><i class="ti ti-check"></i> Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: NOUVELLE TÂCHE ══════════════════════════════ -->
+<div class="modal-overlay" id="modal-tache">
+  <div class="modal-box">
+    <div class="modal-title">Nouvelle tâche</div>
+    <div class="modal-field">
+      <label>Description *</label>
+      <input type="text" id="t-titre" placeholder="Ex: Réparer fuite robinet salle A">
+    </div>
+    <div class="modal-row">
+      <div class="modal-field">
+        <label>Catégorie *</label>
+        <select id="t-cat">
+          <option value="">-- Choisir --</option>
+          <option>Bâtiment</option><option>Équipement</option>
+          <option>Nettoyage</option><option>Sécurité</option>
+          <option>Administratif</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label>Priorité</label>
+        <select id="t-prio">
+          <option value="Normal">Normal</option>
+          <option value="Urgent">Urgent</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-row">
+      <div class="modal-field">
+        <label>Assigner à *</label>
+        <select id="t-assigne" onchange="updateAssigneName()">
+          <option value="">-- Choisir --</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label>Échéance</label>
+        <input type="date" id="t-echeance">
+      </div>
+    </div>
+    <div class="modal-field">
+      <label>Notes (optionnel)</label>
+      <input type="text" id="t-notes" placeholder="Détails supplémentaires…">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="UI.closeModal('modal-tache')">Annuler</button>
+      <button class="btn-primary" onclick="submitTache()"><i class="ti ti-check"></i> Assigner</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/api.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/stock.js"></script>
+<script src="js/taches.js"></script>
+<script src="js/messages.js"></script>
+<script>
+// ── INIT ─────────────────────────────────────────────────
+(async () => {
+  const session = Auth.getSession();
+  if (!session) { window.location.href = 'index.html'; return; }
+
+  document.getElementById('topbar-user').title = 'Déconnecter ' + session.nom;
+
+  // Masquer le bouton ajouter si pas admin/responsable
+  const isAdmin = session.role === 'Admin' || session.role === 'Responsable';
+  if (!isAdmin) {
+    document.getElementById('btn-add-stock').style.display = 'none';
+    document.getElementById('btn-add-tache').style.display = 'none';
+    document.getElementById('announce-compose-wrap').style.display = 'none';
+  }
+
+  // Initialise OAuth2 pour l'écriture (silencieux)
+  if (typeof google !== 'undefined') {
+    SheetsAPI.initGSI(ok => { if (!ok) console.warn('OAuth silencieux échoué — demande manuelle au prochain write'); });
+  }
+
+  Stock.renderFilters();
+  Taches.renderFilters();
+  await Promise.all([Stock.load(), Taches.load(), Messagerie.load()]);
+})();
+
+// ── NAVIGATION ───────────────────────────────────────────
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('section-' + id).classList.add('active');
+  document.getElementById('nav-' + id).classList.add('active');
+}
+
+// ── SOUMISSIONS ──────────────────────────────────────────
+async function submitStock() {
+  const nom   = document.getElementById('s-nom').value.trim();
+  const cat   = document.getElementById('s-cat').value;
+  const qty   = parseInt(document.getElementById('s-qty').value) || 0;
+  const min   = parseInt(document.getElementById('s-min').value) || 0;
+  const unite = document.getElementById('s-unite').value.trim() || 'unité';
+  const notes = document.getElementById('s-notes').value.trim();
+  if (!nom || !cat) { UI.showError('Nom et catégorie requis.'); return; }
+  try {
+    await Stock.add(nom, cat, qty, min, unite, notes);
+    ['s-nom','s-cat','s-qty','s-min','s-unite','s-notes'].forEach(id => { document.getElementById(id).value = ''; });
+  } catch(e) { UI.showError(e.message); }
+}
+
+function openModalTache() {
+  Taches.populateMemberSelect('t-assigne');
+  UI.openModal('modal-tache');
+}
+function updateAssigneName() {
+  const sel = document.getElementById('t-assigne');
+  const opt = sel.options[sel.selectedIndex];
+}
+async function submitTache() {
+  const titre  = document.getElementById('t-titre').value.trim();
+  const cat    = document.getElementById('t-cat').value;
+  const prio   = document.getElementById('t-prio').value;
+  const sel    = document.getElementById('t-assigne');
+  const email  = sel.value;
+  const nom    = sel.options[sel.selectedIndex]?.text?.split(' (')[0] || '';
+  const date   = document.getElementById('t-echeance').value;
+  const notes  = document.getElementById('t-notes').value.trim();
+  if (!titre || !cat || !email) { UI.showError('Titre, catégorie et assignation requis.'); return; }
+  try {
+    await Taches.add(titre, cat, prio, email, nom, date, notes);
+    ['t-titre','t-cat','t-prio','t-assigne','t-echeance','t-notes'].forEach(id => { document.getElementById(id).value = ''; });
+  } catch(e) { UI.showError(e.message); }
+}
+
+async function submitAnnonce() {
+  const texte = document.getElementById('announce-text').value.trim();
+  const dest  = document.getElementById('announce-dest').value;
+  if (!texte) { UI.showError('Rédigez un message avant d\'envoyer.'); return; }
+  try {
+    await Messagerie.sendAnnonce(texte, dest);
+    document.getElementById('announce-text').value = '';
+  } catch(e) { UI.showError(e.message); }
+}
+
+async function submitMessage() {
+  const texte = document.getElementById('chat-in').value.trim();
+  if (!texte) return;
+  try { await Messagerie.sendMessage(texte); }
+  catch(e) { UI.showError(e.message); }
+}
+</script>
+
+<!-- Google Identity Services pour OAuth2 (écriture Sheets) -->
+<script src="https://accounts.google.com/gsi/client" async></script>
+</body>
+</html>
