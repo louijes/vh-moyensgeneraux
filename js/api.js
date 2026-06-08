@@ -6,16 +6,37 @@ const SheetsAPI = (() => {
 
   // Initialise l'API Google Identity Services pour OAuth2 (écriture)
   function initGSI(callback) {
-    if (typeof google === 'undefined') { callback(false); return; }
+    if (typeof google === 'undefined') {
+      console.warn('Google GSI non chargé');
+      callback(false); return;
+    }
     const client = google.accounts.oauth2.initTokenClient({
       client_id: CONFIG.CLIENT_ID,
       scope: 'https://www.googleapis.com/auth/spreadsheets',
       callback: (resp) => {
-        if (resp.access_token) { _token = resp.access_token; callback(true); }
-        else callback(false);
+        if (resp.access_token) {
+          _token = resp.access_token;
+          // Renouvelle le token automatiquement 5 min avant expiration
+          setTimeout(() => initGSI(() => {}), (resp.expires_in - 300) * 1000);
+          callback(true);
+        } else {
+          console.error('OAuth échoué', resp);
+          callback(false);
+        }
+      },
+      error_callback: (err) => {
+        console.error('OAuth erreur', err);
+        callback(false);
       }
     });
-    client.requestAccessToken({ prompt: '' });
+    // Force la popup de consentement Google
+    client.requestAccessToken({ prompt: 'consent' });
+  }
+
+  // Appel manuel OAuth — utilisé si le token est expiré ou absent
+  function requestWrite(callback) {
+    if (_token) { callback(true); return; }
+    initGSI(callback);
   }
 
   // Lecture d'un onglet (lecture seule, clé API suffit)
@@ -63,5 +84,5 @@ const SheetsAPI = (() => {
     return new Date().toLocaleString('fr-CA', { timeZone: 'America/Toronto' });
   }
 
-  return { read, append, update, initGSI, newId, now };
+  return { read, append, update, initGSI, requestWrite, newId, now };
 })();
