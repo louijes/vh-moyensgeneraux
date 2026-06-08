@@ -275,10 +275,19 @@
     document.getElementById('announce-compose-wrap').style.display = 'none';
   }
 
-  // Initialise OAuth2 pour l'écriture (silencieux)
-  if (typeof google !== 'undefined') {
-    SheetsAPI.initGSI(ok => { if (!ok) console.warn('OAuth silencieux échoué — demande manuelle au prochain write'); });
+  // Initialise OAuth2 pour l'écriture — attend que GSI soit chargé
+  function tryInitOAuth() {
+    if (typeof google !== 'undefined') {
+      SheetsAPI.initGSI(ok => {
+        if (ok) UI.toast('Accès écriture activé ✓');
+        else UI.showError('Connexion Google requise pour écrire. Rechargez la page.');
+      });
+    } else {
+      // Réessaie dans 1 seconde si GSI pas encore chargé
+      setTimeout(tryInitOAuth, 1000);
+    }
   }
+  tryInitOAuth();
 
   Stock.renderFilters();
   Taches.renderFilters();
